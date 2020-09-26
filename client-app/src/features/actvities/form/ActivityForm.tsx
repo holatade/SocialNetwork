@@ -1,42 +1,36 @@
-import React, { ChangeEvent, FormEvent, useContext, useState } from "react";
+import React, {
+  ChangeEvent,
+  FormEvent,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { Button, Form, Segment } from "semantic-ui-react";
 import { IActivity } from "../../../app/models/activity";
 import { v4 as uuid } from "uuid";
 import ActivityStore from "../../../app/stores/activityStore";
 import { observer } from "mobx-react-lite";
+import { RouteComponentProps } from "react-router-dom";
 
-interface IProps {
-  activity: IActivity;
+interface DetailParams {
+  id: string;
 }
 
-const ActivityForm: React.FC<IProps> = ({
-  //?We put a : initialFormState here to change the name to initialFormstate instead of activity
-  activity: intialFormState,
+const ActivityForm: React.FC<RouteComponentProps<DetailParams>> = ({
+  match,
+  history,
 }) => {
   const activityStore = useContext(ActivityStore);
   const {
     createActivity,
     editActivity,
     submitting,
-    cancelFormOpen,
+    activity: intialFormState,
+    loadActivity,
+    clearActivity,
   } = activityStore;
   // This sets the initial value of activity to the form. If the activity prop is null we set the properties
   //in the activity to an empty string else we return the activity
-  const initializeForm = () => {
-    if (intialFormState) {
-      return intialFormState;
-    } else {
-      return {
-        id: "",
-        title: "",
-        category: "",
-        description: "",
-        date: "",
-        city: "",
-        venue: "",
-      };
-    }
-  };
 
   //onChange for input is a type React.ChangeEvent<HTMLInputElement> but onChnage for a TextArea is React.FormEvent<HTMLTextAreaElememt>
   //To accomodate for type of event we use React.ChangeEvent<HTMLInputElement> and  FormEvent<HTMLTextAreaElement>
@@ -56,14 +50,49 @@ const ActivityForm: React.FC<IProps> = ({
         //? install the package uuid to get access to GUID (npm install uuid) and then (npm install @types/uuid) to get they types
         id: uuid(),
       };
-      createActivity(newActivity);
+      createActivity(newActivity).then(() => {
+        history.push(`/activities/${newActivity.id}`);
+      });
     } else {
-      editActivity(activity);
+      editActivity(activity).then(() => {
+        history.push(`/activities/${activity.id}`);
+      });
     }
   };
 
   //? with this set the state of the activity by calling the initialize form fucnction
-  const [activity, setActivity] = useState<IActivity>(initializeForm);
+  const [activity, setActivity] = useState<IActivity>({
+    id: "",
+    title: "",
+    category: "",
+    description: "",
+    date: "",
+    city: "",
+    venue: "",
+  });
+
+  useEffect(() => {
+    //This check if the theres is an Id in match.params and the initial activity ID is an empty string.
+    //wen we click on the edit activity detail button, we check for the id in the match.params and also chech that the initial activity
+    //Id is an empty string. This done cause after submitting a form, since we redirecting to activity details, the activity detail also
+    //have a match.params.id and this cause the load activity to be called again, to stop thos from happening we add the activity.id
+    //.length check to stop it from happening.
+    if (match.params.id && activity.id.length === 0) {
+      loadActivity(match.params.id).then(() => {
+        intialFormState && setActivity(intialFormState);
+      });
+    }
+    // When component unmount , the acivity will be set to null
+    return () => {
+      clearActivity();
+    };
+  }, [
+    loadActivity,
+    intialFormState,
+    match.params.id,
+    clearActivity,
+    activity.id.length,
+  ]);
 
   return (
     <Segment clearing>
@@ -114,7 +143,7 @@ const ActivityForm: React.FC<IProps> = ({
           content="Submit"
         />
         <Button
-          onClick={cancelFormOpen}
+          onClick={() => history.push("/activities")}
           floated="right"
           type="buttom"
           content="Cancel"

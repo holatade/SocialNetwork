@@ -7,9 +7,7 @@ configure({ enforceActions: "always" });
 
 class ActivityStore {
   @observable activityRegistry = new Map();
-  @observable activities: IActivity[] = [];
-  @observable selectedActivity: IActivity | undefined = undefined;
-  @observable editMode = false;
+  @observable activity: IActivity | null = null;
   @observable loadingInitial = false;
   @observable submitting = false;
   @observable target = "";
@@ -40,6 +38,34 @@ class ActivityStore {
     }
   };
 
+  @action loadActivity = async (id: string) => {
+    let activity = this.getActivity(id);
+    if (activity) {
+      this.activity = activity;
+    } else {
+      this.loadingInitial = true;
+      try {
+        activity = await agent.Activities.details(id);
+        runInAction("getting actvity", () => {
+          this.activity = activity;
+          this.loadingInitial = false;
+        });
+      } catch (error) {
+        runInAction("get activity error", () => {
+          this.loadingInitial = false;
+        });
+      }
+    }
+  };
+
+  getActivity = (id: string) => {
+    return this.activityRegistry.get(id);
+  };
+
+  @action clearActivity = () => {
+    this.activity = null;
+  };
+
   //This handle the create activity , we set or change the set of the former activity array by using a spread operator to addd a
   //new activity, we set the new selected activity to the passed created activity and set edit  mode to false,
   //to see the activity details
@@ -49,9 +75,8 @@ class ActivityStore {
       await agent.Activities.create(activity);
       runInAction("creating activity", () => {
         this.activityRegistry.set(activity.id, activity);
-        this.editMode = false;
         this.submitting = false;
-        this.selectedActivity = activity;
+        this.activity = activity;
       });
     } catch (error) {
       runInAction("create activity error", () => {
@@ -70,8 +95,7 @@ class ActivityStore {
       await agent.Activities.update(activity);
       runInAction("editting an activity", () => {
         this.activityRegistry.set(activity.id, activity);
-        this.selectedActivity = activity;
-        this.editMode = false;
+        this.activity = activity;
         this.submitting = false;
       });
     } catch (error) {
@@ -104,37 +128,6 @@ class ActivityStore {
         console.log(error);
       });
     }
-  };
-
-  // we use this to get a selected activity out of the activity array. we filter the array by the id of the selected activity, this
-  //return back an activity and also wen we do this we set edit mode to false.
-  @action selectActivity = (id: string) => {
-    this.selectedActivity = this.activityRegistry.get(id);
-    this.editMode = false;
-  };
-
-  // This takes the selected activity via id and the set the edit mode to true,
-  @action openEditForm = (id: string) => {
-    this.selectedActivity = this.activityRegistry.get(id);
-    this.editMode = true;
-  };
-
-  // this is used to close the activity detail
-  @action cancelSelectedActivity = () => {
-    this.selectedActivity = undefined;
-  };
-
-  //this cancels the edit/create form
-  @action cancelFormOpen = () => {
-    this.editMode = false;
-  };
-
-  //We use this to handle when the form to create an activity should bve open, we first set the selected activity to null, this will
-  //remove any selected activity, we then set the edit mode to true, this wll render the form to edit.
-  //! This fuctionality is mainly used in the NavBAr to render the create activity form
-  @action openCreateForm = () => {
-    this.selectedActivity = undefined;
-    this.editMode = true;
   };
 }
 

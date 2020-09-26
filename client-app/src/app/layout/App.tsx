@@ -1,30 +1,35 @@
-import React, { useEffect, Fragment, useContext } from "react";
+import React, { Fragment } from "react";
 import { Container } from "semantic-ui-react";
-import { LoadingComponent } from "./LoadingComponent";
-import ActivityStore from "../stores/activityStore";
 import { observer } from "mobx-react-lite";
 import ActvityDashboard from "../../features/actvities/dashboard/ActvityDashboard";
 import NavBar from "../../features/nav/NavBar";
+import { Route, RouteComponentProps, withRouter } from "react-router-dom";
+import ActivityForm from "../../features/actvities/form/ActivityForm";
+import HomePage from "../../features/home/HomePage";
+import ActivityDetails from "../../features/actvities/details/ActivityDetails";
 
-const App = () => {
-  const activityStore = useContext(ActivityStore);
-
-  //? we use this to make a call to fetch the activites from our API, we then set the activity after the fetch from our API
-  //? Note, the emoty array keeps us from running an infinite fetch call
-  useEffect(() => {
-    activityStore.loadActivities();
-  }, [activityStore]);
-
-  if (activityStore.loadingInitial)
-    return <LoadingComponent content="Loading activities..." />;
-
+const App: React.FC<RouteComponentProps> = ({ location }) => {
   return (
     <Fragment>
-      <NavBar />
-      <Container style={{ marginTop: "7em" }}>
-        <ActvityDashboard />
-      </Container>
+      <Route exact path="/" component={HomePage} />
+      <Route
+        path={"/(.+)"}
+        render={() => (
+          <Fragment>
+            <NavBar />
+            <Container style={{ marginTop: "7em" }}>
+              <Route exact path="/activities" component={ActvityDashboard} />
+              <Route path="/activities/:id" component={ActivityDetails} />
+              <Route
+                key={location.key}
+                path={["/createActivity", "/manage/:id"]}
+                component={ActivityForm}
+              />
+            </Container>
+          </Fragment>
+        )}
+      />
     </Fragment>
   );
 };
-export default observer(App);
+export default withRouter(observer(App));
