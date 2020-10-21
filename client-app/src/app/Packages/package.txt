@@ -1,0 +1,13 @@
+This a list of packages installed.
+
+
+{Install React widget with localiser dependency Date-fns : npm install react-widgets react-widgets-date-fns
+
+Install Date-fns the react-widgets-date-fns depends upon  : Now its npm install date-fns@2.0.0-alpha.13
+
+This followed by import 'react-widgets/dist/css/react-widgets.css' in the index file
+and then import dateFnsLocalizer from 'react-widgets-date-fns' in the index file 
+and then a function dateFnsLocalizer() in the index.tsx file}
+
+
+insatll revalidate for client side validation

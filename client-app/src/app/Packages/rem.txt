@@ -1,0 +1,34 @@
+var has? = hu
+// means has can be undefined
+
+var has = hu!
+means hu can be null or undefined
+
+
+/onChange for input is a type React.ChangeEvent<HTMLInputElement> but onChnage for a TextArea is React.FormEvent<HTMLTextAreaElememt>
+  //To accomodate for type of event we use React.ChangeEvent<HTMLInputElement> and  FormEvent<HTMLTextAreaElement>
+  //when the event is form event instead of changeevent the target of the value or name now becomes event.currentTraget instead of event
+  //.target
+  // const handleInputChange = (
+  //   event: ChangeEvent<HTMLInputElement> | FormEvent<HTMLTextAreaElement>
+  // ) => {
+  //   const { name, value } = event.currentTarget;
+  //   setActivity({ ...activity, [name]: value });
+  // };
+
+  // const handleSubmit = () => {
+  //   if (activity.id.length === 0) {
+  //     let newActivity: IActivity = {
+  //       ...activity,
+  //       //? install the package uuid to get access to GUID (npm install uuid) and then (npm install @types/uuid) to get they types
+  //       id: uuid(),
+  //     };
+  //     createActivity(newActivity).then(() => {
+  //       history.push(`/activities/${newActivity.id}`);
+  //     });
+  //   } else {
+  //     editActivity(activity).then(() => {
+  //       history.push(`/activities/${activity.id}`);
+  //     });
+  //   }
+  // };
