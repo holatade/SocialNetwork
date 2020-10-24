@@ -20,7 +20,7 @@ const TextInput: React.FC<IProps> = ({
       //? Note, the input property is passed from the react-final-form FIELD, and wat this provides is an OnChnage handler, 
       //? On-blur handler and also 
       //! Maybe he value of the input as well. This all passed into our input field */}
-      <input type="text" {...input} placeholder={placeholder} />
+      <input type={type} {...input} placeholder={placeholder} />
       {touched && error && (
         <Label basic color="red">
           {error}
