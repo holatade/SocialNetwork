@@ -35,10 +35,11 @@ export default class UserStore{
             const user = await agent.User.register(values);
             runInAction("register user",() => {
                 this.user = user;
+                this.rootStore.commonStore.setToken(user.token);
+                this.rootStore.modalStore.closeModal();
+                history.push('/activities')  ;      
             })   
-            this.rootStore.commonStore.setToken(user.token);
-            this.rootStore.modalStore.closeModal();
-            history.push('/activities')  ;       
+             
         }catch(error){
             throw error;
         }
