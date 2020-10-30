@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using Application.Comment;
 
 namespace Application.Activities
 {
@@ -14,6 +15,7 @@ namespace Application.Activities
         public string City { get; set; }
         public string Venue { get; set; }
         [JsonPropertyName("Attendees")]
-        public ICollection<AttendeeDto> UserActivities  { get; set; }
+        public ICollection<AttendeeDto> UserActivities { get; set; }
+        public ICollection<CommentDto> Comments { get; set; }
     }
 }

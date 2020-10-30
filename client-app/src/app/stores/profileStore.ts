@@ -99,4 +99,21 @@ export default class ProfileStore{
             })          
         }
     }
+
+    //? Not this is partial<IProfile> because we not using all the properties in IProfile
+    @action editProfile = async (profile : Partial<IProfile>) => {
+        try {
+            await agent.Profiles.editProfile(profile);
+            runInAction(() => {
+                if(profile.displayName !== this.rootStore.userStore.user!.displayName){
+                    this.rootStore.userStore.user!.displayName = profile.displayName!;
+                }
+                this.profile = {...this.profile!,...profile}
+            })
+        } catch (error) {
+            runInAction(() => {
+                toast.error("Problem updating profile..");
+            })          
+        }
+    }
 }

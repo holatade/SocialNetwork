@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from "axios";
 import { toast } from "react-toastify";
 import { history } from "../..";
 import { IActivity } from "../models/activity";
-import { IPhoto, IProfile } from "../models/profile";
+import {IPhoto, IProfile } from "../models/profile";
 import { IUser, IUserFormValues } from "../models/user";
 
 axios.defaults.baseURL = " https://localhost:5001/api";
@@ -80,7 +80,8 @@ const Profiles = {
   get : (username : string) : Promise<IProfile> => request.get(`/profiles/${username}`),
   uploadPhoto:(photo: Blob) : Promise<IPhoto> => request.postForm(`/photo`,photo),
   setMainPhoto: (id:string) => request.post(`/photo/${id}/setMain`,{}),
-  deletePhoto: (id:string) => request.del(`/photo/${id}`)
+  deletePhoto: (id:string) => request.del(`/photo/${id}`),
+  editProfile : (profile : Partial<IProfile>) => request.put("/profiles",profile)
 }
 
 export default { Activities,User,Profiles };

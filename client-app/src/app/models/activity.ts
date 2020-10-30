@@ -9,6 +9,16 @@ export interface IActivity {
   isGoing:boolean;
   isHost:boolean;
   Attendees : IAttendee[];
+  comments : IComment[]
+}
+
+export interface IComment{
+  id: string;
+  createdAt: Date;
+  body : string;
+  username : string;
+  displayName : string;
+  image : string;
 }
 
 //! Partial keyword means the values in IActivity can be optional in IActivityFprmVAlues
