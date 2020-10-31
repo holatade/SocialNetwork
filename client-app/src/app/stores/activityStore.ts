@@ -40,11 +40,8 @@ export default class ActivityStore {
 
     this.hubConnection!.start()
       .catch((error) => console.log(error))
-      .then(() => console.log(this.hubConnection!.state))
       .then(() => {
-        console.log("Attempting to join  group");
-        if (this.hubConnection?.state == HubConnectionState.Connected) {
-          console.log("Joined the  group");
+        if (this.hubConnection?.state === HubConnectionState.Connected) {
           this.hubConnection!.invoke("AddToGroup", activityId);
         }
       })
@@ -56,21 +53,18 @@ export default class ActivityStore {
       });
     });
 
-    this.hubConnection!.on("Send", (message) => {
-      toast.info(message);
-    });
+    // this.hubConnection!.on("Send", (message) => {
+    //   toast.info(message);
+    // });
   };
 
   @action stopHubConnection = () => {
-    if (this.hubConnection?.state == HubConnectionState.Connected) {
-      this.hubConnection!.invoke("RemoveFromGroup", this.activity!.id)
-        .then(() => {
+    if (this.hubConnection?.state === HubConnectionState.Connected) {
+      this.hubConnection!.invoke("RemoveFromGroup", this.activity!.id).then(
+        () => {
           this.hubConnection!.stop();
-          console.log(this.hubConnection?.state);
-        })
-        .then(() => {
-          console.log("Connection stopped");
-        });
+        }
+      );
     }
   };
 

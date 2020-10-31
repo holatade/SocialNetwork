@@ -2,16 +2,21 @@ import axios, { AxiosResponse } from "axios";
 import { toast } from "react-toastify";
 import { history } from "../..";
 import { IActivity } from "../models/activity";
-import {IPhoto, IProfile } from "../models/profile";
+import { IPhoto, IProfile } from "../models/profile";
 import { IUser, IUserFormValues } from "../models/user";
 
 axios.defaults.baseURL = " https://localhost:5001/api";
 
-axios.interceptors.request.use((config) => {
-  const token = window.localStorage.getItem('jwt');
-  if(token) config.headers.Authorization =`Bearer ${token}`;
-  return config;
-}, error => {return Promise.reject(error)});
+axios.interceptors.request.use(
+  (config) => {
+    const token = window.localStorage.getItem("jwt");
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 axios.interceptors.response.use(undefined, (error) => {
   if (error.message === "Network Error" && !error.response) {
@@ -50,13 +55,15 @@ const request = {
   put: (url: string, body: {}) =>
     axios.put(url, body).then(sleep(1000)).then(responseBody),
   del: (url: string) => axios.delete(url).then(sleep(1000)).then(responseBody),
-  postForm: (url:string,file:Blob) => {
+  postForm: (url: string, file: Blob) => {
     let formData = new FormData();
-    formData.append('File',file);
-    return axios.post(url,formData, {
-      headers:{'Content-type':'multipart/form-data'}
-    }).then(responseBody);
-  }
+    formData.append("File", file);
+    return axios
+      .post(url, formData, {
+        headers: { "Content-type": "multipart/form-data" },
+      })
+      .then(responseBody);
+  },
 };
 
 const Activities = {
@@ -66,22 +73,32 @@ const Activities = {
   update: (activity: IActivity) =>
     request.put(`/activities/${activity.id}`, activity),
   delete: (id: string) => request.del(`/activities/${id}`),
-  attend: (id: string) => request.post(`/activities/${id}/attend`,{}),
-  unattend: (id:string) => request.del(`/activities/${id}/attend`)
+  attend: (id: string) => request.post(`/activities/${id}/attend`, {}),
+  unattend: (id: string) => request.del(`/activities/${id}/attend`),
 };
 
 const User = {
   current: (): Promise<IUser> => request.get("/user"),
-  login:(user:IUserFormValues) : Promise<IUser> => request.post('/user/login',user),
-  register:(user:IUserFormValues) : Promise<IUser> => request.post('/user/register',user),
-}
+  login: (user: IUserFormValues): Promise<IUser> =>
+    request.post("/user/login", user),
+  register: (user: IUserFormValues): Promise<IUser> =>
+    request.post("/user/register", user),
+};
 
 const Profiles = {
-  get : (username : string) : Promise<IProfile> => request.get(`/profiles/${username}`),
-  uploadPhoto:(photo: Blob) : Promise<IPhoto> => request.postForm(`/photo`,photo),
-  setMainPhoto: (id:string) => request.post(`/photo/${id}/setMain`,{}),
-  deletePhoto: (id:string) => request.del(`/photo/${id}`),
-  editProfile : (profile : Partial<IProfile>) => request.put("/profiles",profile)
-}
+  get: (username: string): Promise<IProfile> =>
+    request.get(`/profiles/${username}`),
+  uploadPhoto: (photo: Blob): Promise<IPhoto> =>
+    request.postForm(`/photo`, photo),
+  setMainPhoto: (id: string) => request.post(`/photo/${id}/setMain`, {}),
+  deletePhoto: (id: string) => request.del(`/photo/${id}`),
+  editProfile: (profile: Partial<IProfile>) =>
+    request.put("/profiles", profile),
+  follow: (username: string) =>
+    request.post(`/profiles/${username}/follow`, {}),
+  unfollow: (username: string) => request.del(`/profiles/${username}/follow`),
+  listFollowings: (username: string, predicate: string): Promise<IProfile[]> =>
+    request.get(`/profiles/${username}/follow?predicate=${predicate}`),
+};
 
-export default { Activities,User,Profiles };
+export default { Activities, User, Profiles };

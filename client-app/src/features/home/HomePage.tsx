@@ -30,7 +30,7 @@ const HomePage = () => {
               content={`Welcome back ${user.displayName}`}
             />
             <Button as={Link} to="/activities" size="huge" inverted>
-              Got to activities!
+              Go to activities!
             </Button>
           </Fragment>
         ) : (
