@@ -14,18 +14,17 @@ namespace API.Controllers
     {
 
         [HttpGet]
-        public async Task<ActionResult<List<ActivityDto>>> List(CancellationToken ct)
+        public async Task<ActionResult<List.ActivitiesEnvelope>> List(int? limit, int? offset,bool isGoing,bool isHost
+            ,DateTime? startDate,CancellationToken ct)
         {
-            return await Mediator.Send(new List.Query(), ct);
-
+            return await Mediator.Send(new List.Query(limit, offset,isGoing,isHost, startDate), ct);
         }
 
         [HttpGet("{id}")]
         [Authorize]
         public async Task<ActionResult<ActivityDto>> Details(Guid id)
         {
-            var x = await Mediator.Send(new Details.Query { Id = id });
-            return x;
+            return await Mediator.Send(new Details.Query { Id = id });
         }
 
         [HttpPost]
